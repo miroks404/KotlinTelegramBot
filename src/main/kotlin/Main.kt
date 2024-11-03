@@ -19,7 +19,7 @@ fun main() {
         val word = Word(
             listOfSplitWords[0],
             listOfSplitWords[1],
-            if (listOfSplitWords[2] == "") 0 else listOfSplitWords[2].toInt()
+            listOfSplitWords.getOrNull(2)?.toIntOrNull() ?: 0
         )
         dictionary.add(word)
     }
