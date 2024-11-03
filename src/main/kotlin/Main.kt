@@ -10,9 +10,34 @@ data class Word(
 
 fun main() {
 
-    val wordsFile: File = File("words.txt")
+    val dictionary = loadDictionary()
 
+    while (true) {
+        println(
+            """
+        Меню:
+        1 - Учить слова
+        2 - Статистика
+        0 - Выход
+    """.trimIndent()
+        )
+
+        val userChoice = readln().toInt()
+
+        when (userChoice) {
+            1 -> println("Учить слова")
+            2 -> println("Статистика")
+            0 -> break
+            else -> println("Введите число 1, 2 или 0")
+        }
+    }
+
+}
+
+fun loadDictionary(): MutableList<Word> {
     val dictionary: MutableList<Word> = mutableListOf()
+
+    val wordsFile = File("words.txt")
 
     wordsFile.forEachLine {
         val listOfSplitWords = it.split("|")
@@ -24,5 +49,5 @@ fun main() {
         dictionary.add(word)
     }
 
-    println(dictionary)
+    return dictionary
 }
