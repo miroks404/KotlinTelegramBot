@@ -26,10 +26,12 @@ fun main() {
 
         when (userChoice) {
             1 -> println("Учить слова")
-            2 -> println("Статистика")
+            2 -> println(getStatistic())
             0 -> break
             else -> println("Введите число 1, 2 или 0")
         }
+
+        println()
     }
 
 }
@@ -51,3 +53,18 @@ fun loadDictionary(): MutableList<Word> {
 
     return dictionary
 }
+
+fun getStatistic(): String {
+    val dictionary = loadDictionary()
+
+    val totalCountOfWords = dictionary.count()
+
+    val totalListOfLearnedWords = dictionary.filter { it.correctAnswersCount >= 3 }
+    val totalCountOfLearnedWords = totalListOfLearnedWords.count()
+
+    val percentCountOfLearnedWords = (totalCountOfLearnedWords * NUMBER_TO_PERCENTAGE) / totalCountOfWords
+
+    return "Выучено $totalCountOfLearnedWords из $totalCountOfWords слов | ${"%.0f".format(percentCountOfLearnedWords)}%"
+}
+
+const val NUMBER_TO_PERCENTAGE = 100.0
