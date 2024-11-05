@@ -10,8 +10,6 @@ data class Word(
 
 fun main() {
 
-    val dictionary = loadDictionary()
-
     while (true) {
         println(
             """
@@ -25,7 +23,7 @@ fun main() {
         val userChoice = readln().toInt()
 
         when (userChoice) {
-            1 -> println("Учить слова")
+            1 -> println(learnWord())
             2 -> println(getStatistic())
             0 -> break
             else -> println("Введите число 1, 2 или 0")
@@ -65,6 +63,30 @@ fun getStatistic(): String {
     val percentCountOfLearnedWords = (totalCountOfLearnedWords * NUMBER_TO_PERCENTAGE) / totalCountOfWords
 
     return "Выучено $totalCountOfLearnedWords из $totalCountOfWords слов | ${"%.0f".format(percentCountOfLearnedWords)}%"
+}
+
+fun learnWord(): String {
+    println()
+
+    val notLearnedList = loadDictionary().filter{ it.correctAnswersCount < 3}
+
+    if (notLearnedList.isEmpty()) return "Все слова в словаре выучены"
+
+    var questionWords: List<Word> = notLearnedList.shuffled().take(4)
+
+    val correctAnswer: Word = questionWords.first()
+
+    questionWords = questionWords.shuffled()
+
+    val getTranslation: (Word) -> String = { word: Word -> word.translation }
+
+    return """
+        ${correctAnswer.original}:
+         1 - ${getTranslation(questionWords[0])}
+         2 - ${getTranslation(questionWords[1])}
+         3 - ${getTranslation(questionWords[2])}
+         4 - ${getTranslation(questionWords[3])} 
+    """.trimIndent()
 }
 
 const val NUMBER_TO_PERCENTAGE = 100.0
