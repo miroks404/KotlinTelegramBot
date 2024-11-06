@@ -10,8 +10,6 @@ data class Word(
 
 fun main() {
 
-    val dictionary = loadDictionary()
-
     while (true) {
         println(
             """
