@@ -10,6 +10,8 @@ data class Word(
 
 fun main() {
 
+    val dictionary = loadDictionary()
+
     while (true) {
         println(
             """
@@ -65,10 +67,11 @@ fun getStatistic(): String {
     return "Выучено $totalCountOfLearnedWords из $totalCountOfWords слов | ${"%.0f".format(percentCountOfLearnedWords)}%"
 }
 
+
 fun learnWord(): String {
     println()
 
-    val notLearnedList = loadDictionary().filter{ it.correctAnswersCount < 3}
+    val notLearnedList = loadDictionary().filter { it.correctAnswersCount < 3 }
 
     if (notLearnedList.isEmpty()) return "Все слова в словаре выучены"
 
@@ -78,15 +81,11 @@ fun learnWord(): String {
 
     questionWords = questionWords.shuffled()
 
-    val getTranslation: (Word) -> String = { word: Word -> word.translation }
-
     return """
-        ${correctAnswer.original}:
-         1 - ${getTranslation(questionWords[0])}
-         2 - ${getTranslation(questionWords[1])}
-         3 - ${getTranslation(questionWords[2])}
-         4 - ${getTranslation(questionWords[3])} 
-    """.trimIndent()
+${correctAnswer.original}:
+${questionWords.mapIndexed { index, word -> "${index + 1} - ${word.translation}" }
+       .joinToString("\n ", " ")}
+"""
 }
 
 const val NUMBER_TO_PERCENTAGE = 100.0
