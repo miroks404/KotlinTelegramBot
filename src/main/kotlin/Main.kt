@@ -5,7 +5,7 @@ import java.io.File
 data class Word(
     val original: String,
     val translation: String,
-    val correctAnswersCount: Int,
+    var correctAnswersCount: Int,
 )
 
 fun main() {
@@ -52,12 +52,20 @@ fun loadDictionary(): MutableList<Word> {
     return dictionary
 }
 
+fun saveDictionary(dictionary: MutableList<Word>) {
+    val wordsFile = File("words.txt")
+
+    wordsFile.writeText("")
+
+    dictionary.forEach { wordsFile.appendText("${it.original}|${it.translation}|${it.correctAnswersCount}\n") }
+}
+
 fun getStatistic(): String {
     val dictionary = loadDictionary()
 
     val totalCountOfWords = dictionary.count()
 
-    val totalListOfLearnedWords = dictionary.filter { it.correctAnswersCount >= 3 }
+    val totalListOfLearnedWords = dictionary.filter { it.correctAnswersCount >= NUMBER_THAT_IS_CONSIDERED_MEMORIZED }
     val totalCountOfLearnedWords = totalListOfLearnedWords.count()
 
     val percentCountOfLearnedWords = (totalCountOfLearnedWords * NUMBER_TO_PERCENTAGE) / totalCountOfWords
@@ -67,9 +75,10 @@ fun getStatistic(): String {
 
 
 fun learnWord(): String {
-    println()
 
-    val notLearnedList = loadDictionary().filter { it.correctAnswersCount < 3 }
+    val dictionary = loadDictionary()
+
+    val notLearnedList = dictionary.filter { it.correctAnswersCount < NUMBER_THAT_IS_CONSIDERED_MEMORIZED }
 
     if (notLearnedList.isEmpty()) return "Все слова в словаре выучены"
 
@@ -79,11 +88,28 @@ fun learnWord(): String {
 
     questionWords = questionWords.shuffled()
 
-    return """
+    println("""
 ${correctAnswer.original}:
-${questionWords.mapIndexed { index, word -> "${index + 1} - ${word.translation}" }
-       .joinToString("\n ", " ")}
-"""
+${
+        questionWords.mapIndexed { index, word -> "${index + 1} - ${word.translation}" }
+            .joinToString("\n ", " ", "\n--------------\n 0 - Меню")
+    }
+""")
+
+    val userAnswerInput = readln().toInt()
+
+    if (userAnswerInput == 0) return "Выход в меню"
+
+    val correctAnswerId = questionWords.indexOf(correctAnswer)
+
+    return if (userAnswerInput == correctAnswerId + 1) {
+        dictionary[dictionary.indexOf(correctAnswer)].correctAnswersCount++
+        saveDictionary(dictionary)
+        "Правильно!"
+    } else "Неправильно! ${correctAnswer.original} - это ${correctAnswer.translation}"
+    
 }
 
 const val NUMBER_TO_PERCENTAGE = 100.0
+
+const val NUMBER_THAT_IS_CONSIDERED_MEMORIZED = 3
