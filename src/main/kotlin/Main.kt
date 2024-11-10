@@ -65,7 +65,7 @@ fun getStatistic(): String {
 
     val totalCountOfWords = dictionary.count()
 
-    val totalListOfLearnedWords = dictionary.filter { it.correctAnswersCount >= 3 }
+    val totalListOfLearnedWords = dictionary.filter { it.correctAnswersCount >= NUMBER_THAT_IS_CONSIDERED_MEMORIZED }
     val totalCountOfLearnedWords = totalListOfLearnedWords.count()
 
     val percentCountOfLearnedWords = (totalCountOfLearnedWords * NUMBER_TO_PERCENTAGE) / totalCountOfWords
@@ -78,7 +78,7 @@ fun learnWord(): String {
 
     val dictionary = loadDictionary()
 
-    val notLearnedList = dictionary.filter { it.correctAnswersCount < 3 }
+    val notLearnedList = dictionary.filter { it.correctAnswersCount < NUMBER_THAT_IS_CONSIDERED_MEMORIZED }
 
     if (notLearnedList.isEmpty()) return "Все слова в словаре выучены"
 
@@ -111,3 +111,5 @@ ${
 }
 
 const val NUMBER_TO_PERCENTAGE = 100.0
+
+const val NUMBER_THAT_IS_CONSIDERED_MEMORIZED = 3
