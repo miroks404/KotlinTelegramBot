@@ -42,7 +42,11 @@ fun main() {
         }
 
         when (userChoice) {
-            1 -> println(learnWord())
+            1 -> while (true) {
+                val consoleLog = learnWord()
+                if (consoleLog == "Выход в меню") break
+                println(consoleLog)
+            }
             2 -> println(trainer.getStatistic())
             0 -> break
             else -> println("Введите число 1, 2 или 0")
