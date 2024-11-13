@@ -15,7 +15,12 @@ fun Question.asConsoleString(): String {
 
 fun main() {
 
-    val trainer = LearnWordTrainer()
+    val trainer = try {
+        LearnWordTrainer()
+    } catch (e: Exception) {
+        println("Невозможно загрузить словарь")
+        return
+    }
 
     while (true) {
         println(
@@ -27,10 +32,21 @@ fun main() {
     """.trimIndent()
         )
 
-        val userChoice = readln().toInt()
+        var userChoice: Int
+
+        try {
+            userChoice = readln().toInt()
+        } catch (e: Exception) {
+            println("Вводите только числа!")
+            return main()
+        }
 
         when (userChoice) {
-            1 -> println(learnWord())
+            1 -> while (true) {
+                val consoleLog = learnWord()
+                if (consoleLog == "Выход в меню") break
+                println(consoleLog)
+            }
             2 -> println(trainer.getStatistic())
             0 -> break
             else -> println("Введите число 1, 2 или 0")
@@ -52,7 +68,14 @@ ${question.correctAnswer.original}:
 ${question.asConsoleString()} 
 """)
 
-    val userAnswerInput = readln().toInt()
+    val userAnswerInput: Int
+
+    try {
+        userAnswerInput = readln().toInt()
+    } catch (e: Exception) {
+        println("Вводите только числа 0, 1, 2, 3, 4")
+        return learnWord()
+    }
 
     if (userAnswerInput == 0) return "Выход в меню"
 

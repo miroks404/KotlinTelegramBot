@@ -7,7 +7,7 @@ data class Question(
     val correctAnswer: Word,
 )
 
-class LearnWordTrainer {
+class LearnWordTrainer(private val countOfQuestionWords: Int = 4) {
 
     private var question: Question? = null
     private val dictionary = loadDictionary()
@@ -34,7 +34,14 @@ class LearnWordTrainer {
         val notLearnedList = dictionary.filter { it.correctAnswersCount < NUMBER_THAT_IS_CONSIDERED_MEMORIZED }
         if (notLearnedList.isEmpty()) return null
 
-        val questionWords: List<Word> = notLearnedList.shuffled().take(4)
+        val questionWords = if (notLearnedList.size < countOfQuestionWords) {
+            val learnedList =
+                dictionary.filter { it.correctAnswersCount >= NUMBER_THAT_IS_CONSIDERED_MEMORIZED }.shuffled()
+            notLearnedList.shuffled()
+                .take(countOfQuestionWords) + learnedList.take(countOfQuestionWords - notLearnedList.size)
+        } else {
+            notLearnedList.shuffled().take(countOfQuestionWords)
+        }.shuffled()
 
         val correctAnswer: Word = questionWords.first()
 
@@ -60,21 +67,26 @@ class LearnWordTrainer {
     }
 
     private fun loadDictionary(): MutableList<Word> {
-        val dictionary: MutableList<Word> = mutableListOf()
+        try {
+            val dictionary: MutableList<Word> = mutableListOf()
 
-        val wordsFile = File("words.txt")
+            val wordsFile = File("words.txt")
 
-        wordsFile.forEachLine {
-            val listOfSplitWords = it.split("|")
-            val word = Word(
-                listOfSplitWords[0],
-                listOfSplitWords[1],
-                listOfSplitWords.getOrNull(2)?.toIntOrNull() ?: 0
-            )
-            dictionary.add(word)
+            wordsFile.forEachLine {
+                val listOfSplitWords = it.split("|")
+
+                val word = Word(
+                    listOfSplitWords[0],
+                    listOfSplitWords[1],
+                    listOfSplitWords.getOrNull(2)?.toIntOrNull() ?: 0
+                )
+                dictionary.add(word)
+            }
+
+            return dictionary
+        } catch (e: IndexOutOfBoundsException) {
+            throw IllegalStateException("Некорректный файл")
         }
-
-        return dictionary
     }
 
     private fun saveDictionary(dictionary: MutableList<Word>) {
