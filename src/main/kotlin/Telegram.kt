@@ -11,18 +11,28 @@ fun main(args: Array<String>) {
 
     var updateId = 0
 
+    val updateIdRegex = "\"update_id\":(.+?),".toRegex()
+
+    val messageTextRegex = "\"text\":\"(.+?)\"".toRegex()
+
     while (true) {
         Thread.sleep(2000)
         val updates = getUpdates(botToken, updateId)
         println(updates)
-        val startUpdateId = updates.lastIndexOf("update_id")
-        val endUpdateId = updates.lastIndexOf(",\n")
 
-        if (startUpdateId == -1 || endUpdateId == -1) continue
+        val updateIdResult: MatchResult? = updateIdRegex.find(updates)
+        updateId = updateIdResult?.groups?.get(1)?.value?.toInt()?:-1
 
-        val updateIdString = updates.substring(startUpdateId + 11, endUpdateId)
+        if (updateId == -1) continue
 
-        updateId = updateIdString.toInt() + 1
+        println(updateId)
+
+        updateId++
+
+        val messageTextResult = messageTextRegex.find(updates)
+        val messageText = messageTextResult?.groups?.get(1)?.value
+
+        println(messageText)
     }
 
 }
