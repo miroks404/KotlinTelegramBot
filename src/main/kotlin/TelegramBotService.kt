@@ -7,10 +7,10 @@ import java.net.http.HttpResponse
 
 class TelegramBotService(private val botToken: String) {
 
-    fun getUpdates(updateId: Int): String {
-        val urlGetUpdates = "https://api.telegram.org/bot$botToken/getUpdates?offset=$updateId"
+    private val client = HttpClient.newBuilder().build()
 
-        val client: HttpClient = HttpClient.newBuilder().build()
+    fun getUpdates(updateId: Int): String {
+        val urlGetUpdates = "$URL_API_TELEGRAM$botToken/getUpdates?offset=$updateId"
 
         val requestGetUpdates: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlGetUpdates)).build()
         val responseGetUpdates: HttpResponse<String> =
@@ -21,15 +21,13 @@ class TelegramBotService(private val botToken: String) {
 
     fun sendMessage(chatId: String, text: String) {
 
-        val urlSendMessage = "https://api.telegram.org/bot$botToken/sendMessage?chat_id=$chatId&text=$text"
-
-        val client = HttpClient.newBuilder().build()
+        val urlSendMessage = "$URL_API_TELEGRAM$botToken/sendMessage?chat_id=$chatId&text=$text"
 
         val requestSendMessage = try {
             HttpRequest.newBuilder().uri(URI.create(urlSendMessage)).build()
         } catch (e: IllegalArgumentException) {
             HttpRequest.newBuilder()
-                .uri(URI.create("https://api.telegram.org/bot$botToken/sendMessage?chat_id=$chatId&text=Пиши%20по%20английски"))
+                .uri(URI.create("$URL_API_TELEGRAM/sendMessage?chat_id=$chatId&text=Пиши%20по%20английски"))
                 .build()
         }
 
@@ -37,3 +35,5 @@ class TelegramBotService(private val botToken: String) {
     }
 
 }
+
+private const val URL_API_TELEGRAM = "https://api.telegram.org/bot"
