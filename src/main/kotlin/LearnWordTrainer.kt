@@ -2,6 +2,12 @@ package org.example
 
 import java.io.File
 
+data class Word(
+    val original: String,
+    val translation: String,
+    var correctAnswersCount: Int,
+)
+
 data class Question(
     val variants: List<Word>,
     val correctAnswer: Word,
