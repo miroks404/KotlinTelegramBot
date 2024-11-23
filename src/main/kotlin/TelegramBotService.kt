@@ -50,11 +50,11 @@ class TelegramBotService(private val botToken: String) {
                         [
                             {
                                 "text" : "Изучить слова",
-                                "callback_data" : "learn_words_clicked"
+                                "callback_data" : "$LEARN_WORDS_DATA"
                             },
                             {
                                 "text" : "Статистика",
-                                "callback_data" : "statistics_clicked"
+                                "callback_data" : "$STATISTICS_DATA"
                             }
                         ]
                     ]
@@ -76,3 +76,5 @@ class TelegramBotService(private val botToken: String) {
 }
 
 private const val URL_API_TELEGRAM = "https://api.telegram.org/bot"
+private const val LEARN_WORDS_DATA = "learn_words_clicked"
+private const val STATISTICS_DATA = "statistics_clicked"

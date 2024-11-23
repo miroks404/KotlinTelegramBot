@@ -30,8 +30,8 @@ fun main(args: Array<String>) {
 
         updateId++
 
-        val messageText = messageTextRegex.find(updates)?.groups?.get(1)?.value ?: " "
-        val chatId = chatIdRegex.find(updates)?.groups?.get(1)?.value ?: " "
+        val messageText = messageTextRegex.find(updates)?.groups?.get(1)?.value ?: continue
+        val chatId = chatIdRegex.find(updates)?.groups?.get(1)?.value ?: continue
         val data = dataRegex.find(updates)?.groups?.get(1)?.value ?: " "
 
         if (messageText.lowercase() == "/start") telegramService.sendMenu(chatId)
