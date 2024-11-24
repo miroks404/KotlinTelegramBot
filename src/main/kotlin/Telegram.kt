@@ -36,8 +36,8 @@ fun main(args: Array<String>) {
 
         if (messageText.lowercase() == "/start") telegramService.sendMenu(chatId)
 
-        if (data.lowercase() == "statistics_clicked")
-            telegramService.sendMessage(chatId, "Выучено 10 из 10 слов | 100%")
+        if (data == "statistics_clicked")
+            telegramService.sendMessage(chatId, trainer.getStatistic())
     }
 
 }
