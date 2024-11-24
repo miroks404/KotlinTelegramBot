@@ -2,6 +2,8 @@ package org.example
 
 fun main(args: Array<String>) {
 
+    val trainer = LearnWordTrainer()
+
     val telegramService = TelegramBotService(args[0])
 
     var updateId = 0
@@ -10,7 +12,9 @@ fun main(args: Array<String>) {
 
     val messageTextRegex = "\"text\":\"(.+?)\"".toRegex()
 
-    val chatIdRegex = "\"id\":(.+?),".toRegex()
+    val chatIdRegex = "\"chat\":\\{\"id\":(.+?),".toRegex()
+
+    val dataRegex = "\"data\":\"(.+?)\"".toRegex()
 
     while (true) {
         Thread.sleep(2000)
@@ -26,14 +30,14 @@ fun main(args: Array<String>) {
 
         updateId++
 
-        val messageTextResult = messageTextRegex.find(updates)
-        val messageText = messageTextResult?.groups?.get(1)?.value ?: " "
+        val messageText = messageTextRegex.find(updates)?.groups?.get(1)?.value ?: continue
+        val chatId = chatIdRegex.find(updates)?.groups?.get(1)?.value ?: continue
+        val data = dataRegex.find(updates)?.groups?.get(1)?.value ?: " "
 
-        println(messageText)
+        if (messageText.lowercase() == "/start") telegramService.sendMenu(chatId)
 
-        val chatId = chatIdRegex.find(updates)?.groups?.get(1)?.value ?: " "
-
-        telegramService.sendMessage(chatId, messageText)
+        if (data.lowercase() == "statistics_clicked")
+            telegramService.sendMessage(chatId, "Выучено 10 из 10 слов | 100%")
     }
 
 }
