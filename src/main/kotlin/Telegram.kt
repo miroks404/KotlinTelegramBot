@@ -38,10 +38,12 @@ fun main(args: Array<String>) {
 
         when(data) {
             "statistics_clicked" -> telegramService.sendMessage(chatId, trainer.getStatistic())
+            "learn_words_clicked" -> telegramService.checkNextQuestionAndSend(trainer, chatId)
         }
     }
 
 }
+
 
 
 
