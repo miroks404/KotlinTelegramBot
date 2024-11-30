@@ -36,8 +36,9 @@ fun main(args: Array<String>) {
 
         if (messageText.lowercase() == "/start") telegramService.sendMenu(chatId)
 
-        if (data == "statistics_clicked")
-            telegramService.sendMessage(chatId, trainer.getStatistic())
+        when(data) {
+            "statistics_clicked" -> telegramService.sendMessage(chatId, trainer.getStatistic())
+        }
     }
 
 }
