@@ -12,7 +12,7 @@ class TelegramBotService(private val botToken: String) {
     private val client = HttpClient.newBuilder().build()
 
     fun getUpdates(updateId: Int): String {
-        val urlGetUpdates = "$URL_API_TELEGRAM$botToken/getUpdates?offset=$updateId"
+        val urlGetUpdates = "${Constants.URL_API_TELEGRAM}$botToken/getUpdates?offset=$updateId"
 
         val requestGetUpdates: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlGetUpdates)).build()
         val responseGetUpdates: HttpResponse<String> =
@@ -30,7 +30,7 @@ class TelegramBotService(private val botToken: String) {
 
         println(encoded)
 
-        val urlSendMessage = "$URL_API_TELEGRAM$botToken/sendMessage?chat_id=$chatId&text=$encoded"
+        val urlSendMessage = "${Constants.URL_API_TELEGRAM}$botToken/sendMessage?chat_id=$chatId&text=$encoded"
 
         val requestSendMessage = HttpRequest.newBuilder().uri(URI.create(urlSendMessage)).build()
 
@@ -39,7 +39,7 @@ class TelegramBotService(private val botToken: String) {
 
     fun sendMenu(chatId: String) : String {
 
-        val sendMessage = "$URL_API_TELEGRAM$botToken/sendMessage"
+        val sendMessage = "${Constants.URL_API_TELEGRAM}$botToken/sendMessage"
 
         val sendMenuBody = """
             {
@@ -50,11 +50,11 @@ class TelegramBotService(private val botToken: String) {
                         [
                             {
                                 "text" : "Изучить слова",
-                                "callback_data" : "$LEARN_WORDS_DATA"
+                                "callback_data" : "${Constants.LEARN_WORDS_DATA}"
                             },
                             {
                                 "text" : "Статистика",
-                                "callback_data" : "$STATISTICS_DATA"
+                                "callback_data" : "${Constants.STATISTICS_DATA}"
                             }
                         ]
                     ]
@@ -73,23 +73,22 @@ class TelegramBotService(private val botToken: String) {
         return response.body()
     }
 
-    fun checkNextQuestionAndSend(
-        trainer: LearnWordTrainer,
-        chatId: String
-    ) {
-
-        val question = trainer.getNextQuestion()
-        if (question == null) sendMessage(chatId, "Вы выучили все слова в базе")
-
-        sendQuestion(chatId, question!!)
-
-    }
-
-    private fun sendQuestion(
+    fun sendQuestion(
         chatId: String,
         question: Question
     ) : String {
-        val sendMessage = "$URL_API_TELEGRAM$botToken/sendMessage"
+        val sendMessage = "${Constants.URL_API_TELEGRAM}$botToken/sendMessage"
+
+        val variantsString = question.variants
+            .mapIndexed { index, word ->
+                """
+            {
+                "text": "${word.translation}",
+                "callback_data": "${Constants.CALLBACK_DATA_ANSWER_PREFIX}${index}" 
+            }
+        """.trimIndent()
+            }
+            .joinToString(separator = ",")
 
         val sendMenuBody = """
             {
@@ -98,24 +97,7 @@ class TelegramBotService(private val botToken: String) {
                 "reply_markup" : {
                     "inline_keyboard" : [
                         [
-                            {
-                                "text" : "${question.variants[0].translation}",
-                                "callback_data" : "${CALLBACK_DATA_ANSWER_PREFIX + 0}"
-                            },
-                            {
-                                "text" : "${question.variants[1].translation}",
-                                "callback_data" : "${CALLBACK_DATA_ANSWER_PREFIX + 1}"
-                            }
-                        ],
-                        [
-                            {
-                                "text" : "${question.variants[2].translation}",
-                                "callback_data" : "${CALLBACK_DATA_ANSWER_PREFIX + 2}"
-                            },
-                            {
-                                 "text" : "${question.variants[3].translation}",
-                                 "callback_data" : "${CALLBACK_DATA_ANSWER_PREFIX + 3}"
-                            }
+                            $variantsString
                         ]
                     ]
                 }
@@ -134,8 +116,3 @@ class TelegramBotService(private val botToken: String) {
     }
 
 }
-
-private const val URL_API_TELEGRAM = "https://api.telegram.org/bot"
-private const val LEARN_WORDS_DATA = "learn_words_clicked"
-private const val STATISTICS_DATA = "statistics_clicked"
-private const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
