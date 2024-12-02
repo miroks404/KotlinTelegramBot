@@ -16,6 +16,17 @@ fun main(args: Array<String>) {
 
     val dataRegex = "\"data\":\"(.+?)\"".toRegex()
 
+    fun checkNextQuestionAndSend(
+        trainer: LearnWordTrainer,
+        chatId: String
+    ) {
+
+        val question = trainer.getNextQuestion()
+        if (question == null) telegramService.sendMessage(chatId, "Вы выучили все слова в базе")
+        else telegramService.sendQuestion(chatId, question)
+
+    }
+
     while (true) {
         Thread.sleep(2000)
         val updates = telegramService.getUpdates(updateId)
@@ -37,11 +48,16 @@ fun main(args: Array<String>) {
         if (messageText.lowercase() == "/start") telegramService.sendMenu(chatId)
 
         when(data) {
-            "statistics_clicked" -> telegramService.sendMessage(chatId, trainer.getStatistic())
+            Constants.STATISTICS_DATA -> telegramService.sendMessage(chatId, trainer.getStatistic())
+            Constants.LEARN_WORDS_DATA -> checkNextQuestionAndSend(trainer, chatId)
         }
     }
 
 }
+
+
+
+
 
 
 
