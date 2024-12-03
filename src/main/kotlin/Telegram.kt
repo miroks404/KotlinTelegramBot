@@ -16,18 +16,6 @@ fun main(args: Array<String>) {
 
     val dataRegex = "\"data\":\"(.+?)\"".toRegex()
 
-    fun checkNextQuestionAndSend(
-        trainer: LearnWordTrainer,
-        chatId: String
-    ): Question? {
-
-        val question = trainer.getNextQuestion()
-        if (question == null) telegramService.sendMessage(chatId, "Вы выучили все слова в базе")
-        else telegramService.sendQuestion(chatId, question)
-
-        return question
-    }
-
     var currentQuestion: Question? = null
 
     while (true) {
@@ -53,8 +41,9 @@ fun main(args: Array<String>) {
         when (data) {
             Constants.STATISTICS_DATA -> telegramService.sendMessage(chatId, trainer.getStatistic())
             Constants.LEARN_WORDS_DATA -> {
-                currentQuestion = checkNextQuestionAndSend(trainer, chatId)
+                currentQuestion = checkNextQuestionAndSend(args[0], trainer, chatId)
             }
+            Constants.MENU_DATA -> telegramService.sendMenu(chatId)
         }
 
         if (data.startsWith(Constants.CALLBACK_DATA_ANSWER_PREFIX)) {
@@ -67,12 +56,27 @@ fun main(args: Array<String>) {
                 )
             }
 
-            currentQuestion = checkNextQuestionAndSend(trainer, chatId)
+            currentQuestion = checkNextQuestionAndSend(args[0], trainer, chatId)
 
         }
 
     }
 
+}
+
+fun checkNextQuestionAndSend(
+    botToken: String,
+    trainer: LearnWordTrainer,
+    chatId: String
+): Question? {
+
+    val telegramService = TelegramBotService(botToken)
+
+    val question = trainer.getNextQuestion()
+    if (question == null) telegramService.sendMessage(chatId, "Вы выучили все слова в базе")
+    else telegramService.sendQuestion(chatId, question)
+
+    return question
 }
 
 
