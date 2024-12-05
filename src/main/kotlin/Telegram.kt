@@ -41,7 +41,7 @@ fun main(args: Array<String>) {
         when (data) {
             Constants.STATISTICS_DATA -> telegramService.sendMessage(chatId, trainer.getStatistic())
             Constants.LEARN_WORDS_DATA -> {
-                currentQuestion = checkNextQuestionAndSend(args[0], trainer, chatId)
+                currentQuestion = checkNextQuestionAndSend(telegramService, trainer, chatId)
             }
             Constants.MENU_DATA -> telegramService.sendMenu(chatId)
         }
@@ -56,7 +56,7 @@ fun main(args: Array<String>) {
                 )
             }
 
-            currentQuestion = checkNextQuestionAndSend(args[0], trainer, chatId)
+            currentQuestion = checkNextQuestionAndSend(telegramService, trainer, chatId)
 
         }
 
@@ -65,12 +65,10 @@ fun main(args: Array<String>) {
 }
 
 fun checkNextQuestionAndSend(
-    botToken: String,
+    telegramService: TelegramBotService,
     trainer: LearnWordTrainer,
     chatId: String
 ): Question? {
-
-    val telegramService = TelegramBotService(botToken)
 
     val question = trainer.getNextQuestion()
     if (question == null) telegramService.sendMessage(chatId, "Вы выучили все слова в базе")
