@@ -16,16 +16,7 @@ fun main(args: Array<String>) {
 
     val dataRegex = "\"data\":\"(.+?)\"".toRegex()
 
-    fun checkNextQuestionAndSend(
-        trainer: LearnWordTrainer,
-        chatId: String
-    ) {
-
-        val question = trainer.getNextQuestion()
-        if (question == null) telegramService.sendMessage(chatId, "Вы выучили все слова в базе")
-        else telegramService.sendQuestion(chatId, question)
-
-    }
+    var currentQuestion: Question? = null
 
     while (true) {
         Thread.sleep(2000)
@@ -47,12 +38,43 @@ fun main(args: Array<String>) {
 
         if (messageText.lowercase() == "/start") telegramService.sendMenu(chatId)
 
-        when(data) {
+        when (data) {
             Constants.STATISTICS_DATA -> telegramService.sendMessage(chatId, trainer.getStatistic())
-            Constants.LEARN_WORDS_DATA -> checkNextQuestionAndSend(trainer, chatId)
+            Constants.LEARN_WORDS_DATA -> {
+                currentQuestion = checkNextQuestionAndSend(telegramService, trainer, chatId)
+            }
+            Constants.MENU_DATA -> telegramService.sendMenu(chatId)
         }
+
+        if (data.startsWith(Constants.CALLBACK_DATA_ANSWER_PREFIX)) {
+            val userAnswerIndex = data.substringAfter(Constants.CALLBACK_DATA_ANSWER_PREFIX).toInt()
+            when (trainer.checkAnswer(userAnswerIndex)) {
+                true -> telegramService.sendMessage(chatId, "Правильно!")
+                false -> telegramService.sendMessage(
+                    chatId,
+                    "Неправильно! ${currentQuestion?.correctAnswer?.original} - это ${currentQuestion?.correctAnswer?.translation}"
+                )
+            }
+
+            currentQuestion = checkNextQuestionAndSend(telegramService, trainer, chatId)
+
+        }
+
     }
 
+}
+
+fun checkNextQuestionAndSend(
+    telegramService: TelegramBotService,
+    trainer: LearnWordTrainer,
+    chatId: String
+): Question? {
+
+    val question = trainer.getNextQuestion()
+    if (question == null) telegramService.sendMessage(chatId, "Вы выучили все слова в базе")
+    else telegramService.sendQuestion(chatId, question)
+
+    return question
 }
 
 

@@ -98,6 +98,12 @@ class TelegramBotService(private val botToken: String) {
                     "inline_keyboard" : [
                         [
                             $variantsString
+                        ],
+                        [
+                            {
+                                "text": "Меню",
+                                "callback_data": "${Constants.MENU_DATA}" 
+                            }
                         ]
                     ]
                 }
