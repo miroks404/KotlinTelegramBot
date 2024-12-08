@@ -7,6 +7,6 @@ object Constants {
     const val STATISTICS_DATA = "statistics_clicked"
     const val MENU_DATA = "menu_clicked"
     const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
-
+    const val RESET_DATA = "reset_clicked"
 
 }

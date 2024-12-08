@@ -24,3 +24,65 @@ sugar|сахар|0
 salt|соль|0
 pepper|перец|0
 flour|мука|0
+bread|хлеб|0
+cake|торт|0
+pie|пирог|0
+cookie|печенье|0
+chocolate|шоколад|0
+ice cream|мороженое|0
+jam|варенье|0
+honey|мед|0
+vinegar|уксус|0
+oil|масло|0
+pasta|паста|0
+rice|рис|0
+noodles|лапша|0
+soup|суп|0
+salad|салат|0
+sandwich|бутерброд|0
+pizza|пицца|0
+hamburger|гамбургер|0
+hot dog|хот-дог|0
+fries|картофель фри|0
+cheese sandwich|бутерброд с сыром|0
+tuna|тунец|0
+shrimp|креветки|0
+crab|краб|0
+lobster|омар|0
+mushroom|гриб|0
+spinach|шпинат|0
+cabbage|капуста|0
+lettuce|салат (листовой)|0
+pepper|перец (приправа)|0
+chili|чили|0
+cucumber|огурец|0
+radish|редис|0
+pumpkin|тыква|0
+zucchini|кабачок|0
+eggplant|баклажан|0
+peas|горох|0
+beans|фасоль|0
+lentils|чечевица|0
+spinach|шпинат|0
+avocado|авокадо|0
+pomegranate|гранат|0
+pear|груша|0
+apricot|абрикос|0
+peach|персик|0
+plum|слива|0
+cherry|вишня|0
+blueberry|черника|0
+raspberry|малина|0
+blackberry|ежевика|0
+kiwi|киви|0
+melon|дыня|0
+papaya|папайя|0
+coconut|кокос|0
+fig|инжир|0
+date|финик|0
+persimmon|хурма|0
+mango|манго|0
+lemon|лимон|0
+lime|лайм|0
+grapefruit|грейпфрут|0
+tangerine|мандарин|0
