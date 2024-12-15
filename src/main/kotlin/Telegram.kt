@@ -3,6 +3,7 @@ package org.example
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import java.io.IOException
 
 @Serializable
 data class Response(
@@ -60,7 +61,13 @@ fun main(args: Array<String>) {
 
     while (true) {
         Thread.sleep(2000)
-        val updates = telegramService.getUpdates(updateId)
+
+        val updates = try {
+            telegramService.getUpdates(updateId)
+        } catch (e: IOException) {
+            continue
+        }
+
         println(updates)
 
         val update = jsonWithIgnoreKeys.decodeFromString<Response>(updates)
