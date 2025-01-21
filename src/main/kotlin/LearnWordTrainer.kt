@@ -1,7 +1,5 @@
 package org.example
 
-import java.io.File
-
 data class Word(
     val original: String,
     val translation: String,
@@ -13,22 +11,26 @@ data class Question(
     val correctAnswer: Word,
 )
 
+interface IUserDictionary {
+    fun getNumOfLearnedWords(): Int
+    fun getSize(): Int
+    fun getLearnedWords(): List<Word>
+    fun getUnlearnedWords(): List<Word>
+    fun setCorrectAnswersCount(original: String, correctAnswersCount: Int)
+    fun resetUserProgress()
+}
+
 class LearnWordTrainer(
-    private val fileName: String = "words.txt",
+    private val dictionary: DatabaseUserDictionary,
     private val countOfQuestionWords: Int = 4
 ) {
 
     private var question: Question? = null
-    private val dictionary = loadDictionary()
 
     fun getStatistic(): String {
-        val dictionary = loadDictionary()
+        val totalCountOfWords = dictionary.getSize()
 
-        val totalCountOfWords = dictionary.count()
-
-        val totalListOfLearnedWords =
-            dictionary.filter { it.correctAnswersCount >= NUMBER_THAT_IS_CONSIDERED_MEMORIZED }
-        val totalCountOfLearnedWords = totalListOfLearnedWords.count()
+        val totalCountOfLearnedWords = dictionary.getNumOfLearnedWords()
 
         val percentCountOfLearnedWords = (totalCountOfLearnedWords * NUMBER_TO_PERCENTAGE) / totalCountOfWords
 
@@ -40,12 +42,12 @@ class LearnWordTrainer(
     }
 
     fun getNextQuestion(): Question? {
-        val notLearnedList = dictionary.filter { it.correctAnswersCount < NUMBER_THAT_IS_CONSIDERED_MEMORIZED }
+        val notLearnedList = dictionary.getUnlearnedWords()
         if (notLearnedList.isEmpty()) return null
 
         val questionWords = if (notLearnedList.size < countOfQuestionWords) {
             val learnedList =
-                dictionary.filter { it.correctAnswersCount >= NUMBER_THAT_IS_CONSIDERED_MEMORIZED }.shuffled()
+                dictionary.getLearnedWords().shuffled()
             notLearnedList.shuffled()
                 .take(countOfQuestionWords) + learnedList.take(countOfQuestionWords - notLearnedList.size)
         } else {
@@ -67,49 +69,17 @@ class LearnWordTrainer(
             val correctAnswerIndex = it.variants.indexOf(it.correctAnswer)
 
             if (correctAnswerIndex == userAnswerIndex) {
-                it.variants[it.variants.indexOf(it.correctAnswer)].correctAnswersCount++
-                saveDictionary()
+                dictionary.setCorrectAnswersCount(
+                    it.correctAnswer.original,
+                    it.variants[it.variants.indexOf(it.correctAnswer)].correctAnswersCount + 1
+                )
                 true
             } else false
         } ?: false
 
     }
 
-    fun resetProgress() {
-        dictionary.forEach { it.correctAnswersCount = 0 }
-        saveDictionary()
-    }
-
-    private fun loadDictionary(): MutableList<Word> {
-        try {
-            val dictionary: MutableList<Word> = mutableListOf()
-
-            val wordsFile = File(fileName)
-            if (!wordsFile.exists()) File("words.txt").copyTo(wordsFile)
-
-            wordsFile.forEachLine {
-                val listOfSplitWords = it.split("|")
-
-                val word = Word(
-                    listOfSplitWords[0],
-                    listOfSplitWords[1],
-                    listOfSplitWords.getOrNull(2)?.toIntOrNull() ?: 0
-                )
-                dictionary.add(word)
-            }
-
-            return dictionary
-        } catch (e: IndexOutOfBoundsException) {
-            throw IllegalStateException("Некорректный файл")
-        }
-    }
-
-    private fun saveDictionary() {
-        val wordsFile = File(fileName)
-
-        wordsFile.writeText("")
-
-        dictionary.forEach { wordsFile.appendText("${it.original}|${it.translation}|${it.correctAnswersCount}\n") }
-    }
-
 }
+
+
+
