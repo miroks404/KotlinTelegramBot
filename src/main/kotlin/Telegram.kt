@@ -39,12 +39,18 @@ data class CallbackQuery(
 
     @SerialName("message")
     val message: Message? = null,
+
+    @SerialName("from")
+    val chat: Chat,
 )
 
 @Serializable
 data class Chat(
     @SerialName("id")
     val chatId: Long,
+
+    @SerialName("username")
+    val username: String
 )
 
 fun main(args: Array<String>) {
@@ -95,8 +101,14 @@ fun handleUpdate(
     val messageText = update.message?.text
     val chatId = update.message?.chat?.chatId ?: update.callbackQuery?.message?.chat?.chatId ?: return
     val data = update.callbackQuery?.data ?: " "
+    val username = update.message?.chat?.username ?: update.callbackQuery?.chat?.username ?: return
 
-    val trainer = trainers.getOrPut(chatId) { LearnWordTrainer("$chatId.txt") }
+    val databaseUserDictionary = DatabaseUserDictionary(
+        username = username,
+        chatId = chatId
+    )
+
+    val trainer = trainers.getOrPut(chatId) { LearnWordTrainer(databaseUserDictionary) }
 
     println(messageText)
 
@@ -115,7 +127,7 @@ fun handleUpdate(
 
         Constants.MENU_DATA -> telegramService.sendMenu(json, chatId)
         Constants.RESET_DATA -> {
-            trainer.resetProgress()
+            databaseUserDictionary.resetUserProgress()
             telegramService.sendMessage(chatId, "Прогресс сброшен!")
         }
     }
@@ -130,7 +142,7 @@ fun handleUpdate(
             )
         }
 
-        currentQuestion[chatId] = checkNextQuestionAndSend(json, telegramService, trainer, chatId) ?: return
+        currentQuestion[chatId] = checkNextQuestionAndSend(json, telegramService, trainer, chatId)
 
     }
 
